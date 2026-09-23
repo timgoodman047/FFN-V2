@@ -94,3 +94,14 @@ grid-template-columns: 1fr;
 }
  
 }
+
+.matchup {
+background: #1b2a40;
+padding: 12px;
+border-radius: 10px;
+margin-bottom: 10px;
+}
+ 
+.matchup strong {
+color: #22c55e;
+}
