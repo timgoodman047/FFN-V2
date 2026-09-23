@@ -29,8 +29,7 @@ padding: 20px;
 .grid {
 display: grid;
 gap: 20px;
-grid-template-columns:
-repeat(auto-fit, minmax(320px, 1fr));
+grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
  
 .card {
@@ -60,9 +59,4 @@ margin-bottom: 8px;
  
 .news {
 margin-top: 20px;
-}
-.grid{
-display:grid !important;
-grid-template-columns:1fr 1fr !important;
-gap:20px;
 }
