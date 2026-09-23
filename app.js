@@ -1,6 +1,7 @@
 const LEAGUE_ID = "1352723400459563008";
  
 async function loadLeague() {
+ 
 try {
  
 const users = await fetch(
@@ -13,12 +14,12 @@ const rosters = await fetch(
  
 const teams = rosters.map(roster => {
  
-const owner =
-users.find(
-u => u.user_id === roster.owner_id
+const owner = users.find(
+user => user.user_id === roster.owner_id
 );
  
 return {
+ 
 team:
 owner?.metadata?.team_name ||
 owner?.display_name ||
@@ -34,40 +35,34 @@ roster.settings?.wins || 0,
 losses:
 roster.settings?.losses || 0,
  
-points:
+pf:
 (roster.settings?.fpts || 0) +
 ((roster.settings?.fpts_decimal || 0) / 100)
+ 
 };
  
 });
- 
-// STANDINGS
  
 teams.sort((a, b) => {
  
 if (b.wins !== a.wins)
 return b.wins - a.wins;
  
-return b.points - a.points;
+return b.pf - a.pf;
  
 });
  
-document.getElementById("standings")
-.innerHTML =
+document.getElementById("standings").innerHTML =
 teams.map((team, index) => `
 <div class="team">
 #${index + 1}
-<strong>${team.team}</strong>
+${team.team}
 <br>
 ${team.wins}-${team.losses}
 </div>
 `).join("");
  
-// POWER RANKINGS
- 
-document.getElementById(
-"powerRankings"
-).innerHTML =
+document.getElementById("powerRankings").innerHTML =
 teams.map((team, index) => `
 <div class="team">
 #${index + 1}
@@ -75,7 +70,14 @@ ${team.team}
 </div>
 `).join("");
  
-// DRESS TRACKER
+document.getElementById("owners").innerHTML =
+teams.map(team => `
+<div class="team">
+${team.owner}
+<br>
+<strong>${team.team}</strong>
+</div>
+`).join("");
  
 const sacko =
 [...teams]
@@ -84,35 +86,28 @@ const sacko =
 if (a.wins !== b.wins)
 return a.wins - b.wins;
  
-return a.points - b.points;
+return a.pf - b.pf;
  
 })
 .slice(0, 3);
  
-document.getElementById(
-"dressTracker"
-).innerHTML =
+document.getElementById("dressTracker").innerHTML =
 sacko.map((team, index) => `
 <div class="team">
-${index + 1}.
-${team.team}
+${index + 1}. ${team.team}
 </div>
 `).join("");
  
-// NEWS
- 
-document.getElementById("news")
-.innerHTML = `
-<strong>Current Leader:</strong>
+document.getElementById("news").innerHTML = `
+<strong>League Leader:</strong>
 ${teams[0].team}
 <br><br>
  
-<strong>Sacko Watch:</strong>
+<strong>Sacko Favorite:</strong>
 ${sacko[0].team}
-currently sits at the top of the Dress Tracker.
 <br><br>
  
-Live standings are updating directly from Sleeper.
+Power Rankings and Standings are updating live from Sleeper.
 `;
  
 }
@@ -120,11 +115,11 @@ catch (error) {
  
 console.error(error);
  
-document.getElementById("standings")
-.innerHTML =
+document.getElementById("standings").innerHTML =
 "Unable to load Sleeper data.";
  
 }
+ 
 }
  
 loadLeague();
