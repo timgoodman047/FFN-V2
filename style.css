@@ -1,1 +1,63 @@
-
+body {
+margin: 0;
+background: #08111f;
+color: white;
+font-family: Arial, sans-serif;
+}
+ 
+header {
+background: #111c2d;
+border-bottom: 4px solid #22c55e;
+padding: 25px;
+}
+ 
+header h1 {
+margin: 0;
+color: #22c55e;
+}
+ 
+header p {
+color: #94a3b8;
+}
+ 
+main {
+max-width: 1400px;
+margin: auto;
+padding: 20px;
+}
+ 
+.grid {
+display: grid;
+gap: 20px;
+grid-template-columns:
+repeat(auto-fit, minmax(320px, 1fr));
+}
+ 
+.card {
+background: #111c2d;
+border-radius: 15px;
+padding: 20px;
+}
+ 
+.card h2 {
+color: #22c55e;
+margin-top: 0;
+}
+ 
+.item {
+background: #1b2a40;
+padding: 12px;
+border-radius: 10px;
+margin-bottom: 10px;
+}
+ 
+.team {
+background: #1b2a40;
+padding: 10px;
+border-radius: 10px;
+margin-bottom: 8px;
+}
+ 
+.news {
+margin-top: 20px;
+}
