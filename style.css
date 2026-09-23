@@ -61,3 +61,8 @@ margin-bottom: 8px;
 .news {
 margin-top: 20px;
 }
+.grid{
+display:grid !important;
+grid-template-columns:1fr 1fr !important;
+gap:20px;
+}
