@@ -1,20 +1,58 @@
-document.getElementById("standings").innerHTML = `
-<div class="team">1. FF FantasyFootball</div>
-<div class="team">2. The Locked Room</div>
-<div class="team">3. Red Kingdom</div>
-`;
+const LEAGUE_ID = "1352723400459563008";
  
-document.getElementById("powerRankings").innerHTML = `
-<div class="team">#1 FF FantasyFootball</div>
-<div class="team">#2 The Locked Room</div>
-<div class="team">#3 Red Kingdom</div>
-`;
+async function loadLeague() {
  
-document.getElementById("dressTracker").innerHTML = `
-<div class="team">1. Bills Mafia</div>
-<div class="team">2. Orangeman</div>
-<div class="team">3. Scheduled Dress Year</div>
-`;
+const users = await fetch(
+`https://api.sleeper.app/v1/league/${LEAGUE_ID}/users`
+).then(r => r.json());
  
-document.getElementById("news").innerHTML =
-"Fantasy Football Network is now running correctly.";
+const rosters = await fetch(
+`https://api.sleeper.app/v1/league/${LEAGUE_ID}/rosters`
+).then(r => r.json());
+ 
+let teams = rosters.map(roster => {
+ 
+const owner = users.find(
+u => u.user_id === roster.owner_id
+);
+ 
+return {
+team:
+owner?.metadata?.team_name ||
+owner?.display_name ||
+"Unknown",
+ 
+wins: roster.settings.wins,
+losses: roster.settings.losses,
+pf: roster.settings.fpts || 0
+};
+});
+ 
+teams.sort((a,b)=>{
+ 
+if(b.wins !== a.wins){
+return b.wins-a.wins;
+}
+ 
+return b.pf-a.pf;
+ 
+});
+ 
+document.getElementById("standings").innerHTML =
+teams.map((t,i)=>`
+<div class="team">
+#${i+1} ${t.team}
+(${t.wins}-${t.losses})
+</div>
+`).join("");
+ 
+document.getElementById("powerRankings").innerHTML =
+teams.map((t,i)=>`
+<div class="team">
+#${i+1} ${t.team}
+</div>
+`).join("");
+ 
+}
+ 
+loadLeague();
