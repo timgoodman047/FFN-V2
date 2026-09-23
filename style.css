@@ -22,41 +22,42 @@ color: #94a3b8;
  
 main {
 max-width: 1400px;
-margin: auto;
+margin: 0 auto;
 padding: 20px;
 }
  
 .grid {
 display: grid;
-gap: 20px;
 grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+gap: 20px;
 }
  
 .card {
 background: #111c2d;
 border-radius: 15px;
 padding: 20px;
+box-shadow: 0 4px 12px rgba(0,0,0,.3);
 }
  
 .card h2 {
-color: #22c55e;
 margin-top: 0;
+color: #22c55e;
 }
  
-.item {
+.item,
+.team {
 background: #1b2a40;
 padding: 12px;
 border-radius: 10px;
 margin-bottom: 10px;
 }
  
-.team {
-background: #1b2a40;
-padding: 10px;
-border-radius: 10px;
-margin-bottom: 8px;
-}
- 
 .news {
 margin-top: 20px;
+}
+ 
+@media (max-width: 768px) {
+.grid {
+grid-template-columns: 1fr;
+}
 }
