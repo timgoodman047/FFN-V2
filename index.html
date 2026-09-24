@@ -3,49 +3,50 @@
  
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
  
 <title>Fantasy Football Network</title>
  
 <link rel="stylesheet" href="style.css">
- 
 </head>
  
 <body>
  
 <header>
+ 
+<div class="logo-row">
 <h1>🏈 Fantasy Football Network</h1>
-<p>League HQ • Anti-PPR Coalition</p>
+<div class="league-tag">
+Anti-PPR Coalition
+</div>
+</div>
+ 
+<p>League HQ Dashboard</p>
+ 
 </header>
  
 <main>
  
 <section class="hero">
  
-<h2>2026 Season Dashboard</h2>
- 
-<div class="hero-stats">
- 
-<div class="stat-card">
-<h3>$1,100</h3>
-<p>Champion Prize</p>
+<div class="hero-card">
+<div class="hero-number">$1,100</div>
+<div class="hero-label">Champion Prize</div>
 </div>
  
-<div class="stat-card">
-<h3>$222</h3>
-<p>Buy-In</p>
+<div class="hero-card">
+<div class="hero-number">$222</div>
+<div class="hero-label">Entry Fee</div>
 </div>
  
-<div class="stat-card">
-<h3>10</h3>
-<p>Teams</p>
+<div class="hero-card">
+<div class="hero-number">10</div>
+<div class="hero-label">Teams</div>
 </div>
  
-<div class="stat-card">
-<h3>🏆</h3>
-<p>Playoffs</p>
-</div>
- 
+<div class="hero-card">
+<div class="hero-number">🏆</div>
+<div class="hero-label">League Title</div>
 </div>
  
 </section>
@@ -53,30 +54,86 @@
 <div class="grid">
  
 <section class="card">
- 
 <h2>🏆 Standings</h2>
- 
 <div id="standings">
 Loading standings...
 </div>
- 
 </section>
  
 <section class="card">
- 
 <h2>📈 Power Rankings</h2>
- 
 <div id="powerRankings">
 Loading rankings...
+</div>
+</section>
+ 
+<section class="card">
+<h2>👗 Dress Tracker™</h2>
+<div id="dressTracker">
+Loading...
+</div>
+</section>
+ 
+<section class="card">
+<h2>🎯 Weekly Matchups</h2>
+<div id="matchups">
+Loading matchups...
+</div>
+</section>
+ 
+<section class="card">
+<h2>👤 Owners</h2>
+<div id="owners">
+Loading owners...
+</div>
+</section>
+ 
+<section class="card">
+<h2>🎲 Playoff Odds</h2>
+ 
+<div class="team">
+Coming Soon
+</div>
+ 
+<div class="team">
+Monte Carlo Simulator
 </div>
  
 </section>
  
 <section class="card">
+<h2>🏆 Hall of Champions</h2>
  
-<h2>👗 Dress Tracker™</h2>
+<div class="team">
+2026 — TBD
+</div>
  
-<div id="dressTracker">
+</section>
+ 
+<section class="card">
+<h2>📜 Constitution</h2>
+ 
+<div class="team">
+2 Keepers
+</div>
+ 
+<div class="team">
+$1,100 Champion
+</div>
+ 
+<div class="team">
+Dress Punishment Active
+</div>
+ 
+</section>
+ 
+</div>
+ 
+<section class="card news-card">
+ 
+<h2>📰 League News Network</h2>
+ 
+<div id="news">
 Loading...
 </div>
  
@@ -84,61 +141,18 @@ Loading...
  
 <section class="card">
  
-<h2>💰 League Info</h2>
- 
-<div class="item">$1,100 Champion</div>
-<div class="item">$440 Runner-Up</div>
-<div class="item">$200 Third Place</div>
-<div class="item">$222 Buy-In</div>
- 
-</section>
- 
-<section class="card">
- 
-<h2>👤 Owners</h2>
- 
-<div id="owners">
-Loading owners...
-</div>
- 
-</section>
-
-<section class="card">
- 
-<h2>🎯 Weekly Matchups</h2>
- 
-<div id="matchups">
+<h2>📊 Record Book</h2>
  
 <div class="team">
-Loading matchups...
+Highest Weekly Score
 </div>
- 
-</div>
- 
-</section> 
-
-<section class="card">
- 
-<h2>🎲 Playoff Odds</h2>
- 
-<div id="playoffOdds">
  
 <div class="team">
-Coming Soon
+Most Points For
 </div>
  
-</div>
- 
-</section>
- 
-</div>
- 
-<section class="card news">
- 
-<h2>📰 League News Network</h2>
- 
-<div id="news">
-Gathering league updates...
+<div class="team">
+Biggest Blowout
 </div>
  
 </section>
@@ -148,5 +162,4 @@ Gathering league updates...
 <script src="app.js"></script>
  
 </body>
- 
 </html>
