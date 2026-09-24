@@ -4,29 +4,22 @@ async function loadLeague() {
  
 try {
  
-const users = await fetch(
-`https://api.sleeper.app/v1/league/${LEAGUE_ID}/users`
-).then(r => r.json());
+const usersResponse = await fetch(
+"https://api.sleeper.app/v1/league/" + LEAGUE_ID + "/users"
+);
  
-const rosters = await fetch(
-`https://api.sleeper.app/v1/league/${LEAGUE_ID}/rosters`
-).then(r => r.json());
+const rostersResponse = await fetch(
+"https://api.sleeper.app/v1/league/" + LEAGUE_ID + "/rosters"
+);
  
-const league = await fetch(
-`https://api.sleeper.app/v1/league/${LEAGUE_ID}`
-).then(r => r.json());
+const users = await usersResponse.json();
+const rosters = await rostersResponse.json();
  
-const currentWeek =
-league.settings?.leg || 1;
+let teams = rosters.map(roster => {
  
-const matchupData = await fetch(
-`https://api.sleeper.app/v1/league/${LEAGUE_ID}/matchups/${currentWeek}`
-).then(r => r.json());
- 
-const teams = rosters.map(roster => {
- 
-const owner = users.find(
-user => user.user_id === roster.owner_id
+const owner =
+users.find(
+u => u.user_id === roster.owner_id
 );
  
 return {
@@ -57,39 +50,67 @@ pf:
  
 });
  
-teams.sort((a,b)=>{
+// TOP 5 = RECORD
  
-if(b.wins !== a.wins){
-return b.wins-a.wins;
+const topFive = [...teams]
+.sort((a, b) => {
+ 
+if (b.wins !== a.wins) {
+return b.wins - a.wins;
 }
  
-return b.pf-a.pf;
+return b.pf - a.pf;
+})
+.slice(0, 5);
  
-});
+// BOTTOM 5 = POINTS FOR
  
-// STANDINGS
+const bottomFive = [...teams]
+.filter(
+team =>
+!topFive.some(
+t => t.team === team.team
+)
+)
+.sort((a, b) => b.pf - a.pf);
+ 
+const finalStandings = [
+...topFive,
+...bottomFive
+];
  
 document.getElementById("standings").innerHTML =
-teams.map((team,index)=>`
+finalStandings.map((team, index) => `
 <div class="team">
-#${index+1}
+#${index + 1}
 <strong>${team.team}</strong>
 <br>
-${team.wins}-${team.losses}
+Record: ${team.wins}-${team.losses}
+<br>
+PF: ${team.pf.toFixed(2)}
 </div>
 `).join("");
- 
-// POWER RANKINGS
  
 document.getElementById("powerRankings").innerHTML =
-teams.map((team,index)=>`
+finalStandings.map((team, index) => `
 <div class="team">
-#${index+1}
-${team.team}
+#${index + 1} ${team.team}
 </div>
 `).join("");
  
-// OWNERS
+const sacko =
+[...teams]
+.sort((a, b) => a.pf - b.pf)
+.slice(0, 3);
+ 
+document.getElementById("dressTracker").innerHTML =
+sacko.map((team, index) => `
+<div class="team">
+${index + 1}. ${team.team}
+<br>
+PF: ${team.pf.toFixed(2)}
+</div>
+`).join("");
  
 document.getElementById("owners").innerHTML =
 teams.map(team => `
@@ -100,95 +121,28 @@ ${team.owner}
 </div>
 `).join("");
  
-// SACKO TRACKER
- 
-const sacko =
-[...teams]
-.sort((a,b)=>{
- 
-if(a.wins !== b.wins){
-return a.wins-b.wins;
-}
- 
-return a.pf-b.pf;
- 
-})
-.slice(0,3);
- 
-document.getElementById("dressTracker").innerHTML =
-sacko.map((team,index)=>`
-<div class="team">
-${index+1}. ${team.team}
-</div>
-`).join("");
- 
-// MATCHUPS
- 
-const matchupGroups = {};
- 
-matchupData.forEach(matchup => {
- 
-if(!matchupGroups[matchup.matchup_id]){
- 
-matchupGroups[matchup.matchup_id] = [];
- 
-}
- 
-matchupGroups[matchup.matchup_id].push(matchup);
- 
-});
- 
-let html = "";
- 
-Object.values(matchupGroups).forEach(group => {
- 
-if(group.length === 2){
- 
-const teamA = teams.find(
-t => t.rosterId === group[0].roster_id
-);
- 
-const teamB = teams.find(
-t => t.rosterId === group[1].roster_id
-);
- 
-html += `
+document.getElementById("matchups").innerHTML =
+`
 <div class="matchup">
- 
-<strong>${teamA?.team}</strong>
- 
-vs
- 
-<strong>${teamB?.team}</strong>
- 
+Weekly Matchup Integration Coming Next
 </div>
 `;
  
-}
- 
-});
- 
-document.getElementById("matchups").innerHTML =
-html;
- 
-// NEWS
- 
-document.getElementById("news").innerHTML = `
+document.getElementById("news").innerHTML =
+`
 <strong>League Leader:</strong>
-${teams[0].team}
- 
+${finalStandings[0].team}
 <br><br>
  
 <strong>Dress Tracker Favorite:</strong>
 ${sacko[0].team}
- 
 <br><br>
  
-Live standings, rankings and matchups are updating directly from Sleeper.
+Standings are live. Bottom five teams are ranked by Points For per league rules.
 `;
  
 }
-catch(error){
+catch (error) {
  
 console.error(error);
  
@@ -199,4 +153,6 @@ document.getElementById("news").innerHTML =
  
 }
  
+loadLeague();
+`
 loadLeague();
