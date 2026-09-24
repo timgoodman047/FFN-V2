@@ -120,3 +120,20 @@ grid-template-columns: 1fr;
 }
  
 }
+
+.matchup {
+ 
+background:#1b2a40;
+border-radius:10px;
+padding:15px;
+margin-bottom:10px;
+text-align:center;
+ 
+}
+ 
+.matchup strong {
+ 
+color:#22c55e;
+font-size:18px;
+ 
+}
