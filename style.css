@@ -161,3 +161,39 @@ grid-template-columns: 1fr;
 }
  
 }
+
+.hero {
+display: grid !important;
+grid-template-columns: repeat(4, 1fr) !important;
+gap: 20px !important;
+}
+ 
+.grid {
+display: grid !important;
+grid-template-columns: repeat(3, 1fr) !important;
+gap: 20px !important;
+}
+ 
+.hero-card {
+background: #111c2d !important;
+border-radius: 14px !important;
+padding: 20px !important;
+}
+ 
+.card {
+background: #111c2d !important;
+border-radius: 14px !important;
+padding: 20px !important;
+}
+ 
+@media (max-width: 768px) {
+ 
+.hero {
+grid-template-columns: 1fr !important;
+}
+ 
+.grid {
+grid-template-columns: 1fr !important;
+}
+ 
+}
