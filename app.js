@@ -4,37 +4,56 @@ async function loadLeague() {
  
 try {
  
-const usersResponse = await fetch(
+// USERS
+ 
+const usersResponse =
+await fetch(
 `https://api.sleeper.app/v1/league/${LEAGUE_ID}/users`
 );
  
-const rostersResponse = await fetch(
+const users =
+await usersResponse.json();
+ 
+// ROSTERS
+ 
+const rostersResponse =
+await fetch(
 `https://api.sleeper.app/v1/league/${LEAGUE_ID}/rosters`
 );
  
-const leagueResponse = await fetch(
+const rosters =
+await rostersResponse.json();
+ 
+// LEAGUE INFO
+ 
+const leagueResponse =
+await fetch(
 `https://api.sleeper.app/v1/league/${LEAGUE_ID}`
 );
  
-const users = await usersResponse.json();
-const rosters = await rostersResponse.json();
-const league = await leagueResponse.json();
+const league =
+await leagueResponse.json();
  
 const currentWeek =
 league.settings?.leg || 1;
  
-const matchupsResponse = await fetch(
+// MATCHUPS
+ 
+const matchupsResponse =
+await fetch(
 `https://api.sleeper.app/v1/league/${LEAGUE_ID}/matchups/${currentWeek}`
 );
  
 const matchupData =
 await matchupsResponse.json();
  
+// BUILD TEAM OBJECTS
+ 
 const teams = rosters.map(roster => {
  
 const owner =
 users.find(
-u => u.user_id === roster.owner_id
+user => user.user_id === roster.owner_id
 );
  
 return {
@@ -58,41 +77,47 @@ losses:
 roster.settings?.losses || 0,
  
 pf:
-(roster.settings?.fpts || 0) +
+Number(roster.settings?.fpts || 0) +
 (
-(roster.settings?.fpts_decimal || 0)
-/ 100
+Number(
+roster.settings?.fpts_decimal || 0
+) / 100
 )
  
 };
  
 });
  
-// -----------------------
+// =====================================
 // STANDINGS
-// -----------------------
+// Top 5 = Record
+// Bottom 5 = Points For
+// =====================================
  
 const topFive =
 [...teams]
-.sort((a,b)=>{
+.sort((a, b) => {
  
-if(b.wins !== a.wins){
+if (b.wins !== a.wins) {
 return b.wins - a.wins;
 }
  
 return b.pf - a.pf;
  
 })
-.slice(0,5);
+.slice(0, 5);
  
 const bottomFive =
 [...teams]
-.filter(team =>
+.filter(
+team =>
 !topFive.some(
 t => t.team === team.team
 )
 )
-.sort((a,b)=>b.pf-a.pf);
+.sort(
+(a, b) => b.pf - a.pf
+);
  
 const standings =
 [
@@ -100,98 +125,86 @@ const standings =
 ...bottomFive
 ];
  
-document.getElementById("standings")
-.innerHTML =
-standings.map((team,index)=>`
+document.getElementById("standings").innerHTML =
+standings.map((team, index) => `
 <div class="team">
- 
-#${index+1}
- 
+#${index + 1}
 <br>
- 
-<strong>
-${team.team}
-</strong>
- 
+<strong>${team.team}</strong>
 <br>
- 
-${team.wins}-${team.losses}
- 
+Record: ${team.wins}-${team.losses}
 <br>
- 
-PF:
-${team.pf.toFixed(2)}
- 
+PF: ${team.pf.toFixed(2)}
 </div>
 `).join("");
  
-// -----------------------
+// =====================================
 // POWER RANKINGS
-// -----------------------
+// =====================================
  
 document.getElementById(
 "powerRankings"
 ).innerHTML =
-standings.map((team,index)=>`
+standings.map((team, index) => `
 <div class="team">
- 
-#${index+1}
- 
+#${index + 1}
 ${team.team}
- 
 </div>
 `).join("");
  
-// -----------------------
+// =====================================
 // DRESS TRACKER
-// -----------------------
+// Lowest PF
+// =====================================
  
 const sacko =
 [...teams]
 .sort(
-(a,b)=>a.pf-b.pf
+(a, b) =>
+a.pf - b.pf
 )
-.slice(0,3);
+.slice(0, 3);
  
 document.getElementById(
 "dressTracker"
 ).innerHTML =
-sacko.map((team,index)=>`
+sacko.map((team, index) => `
 <div class="team">
- 
-${index+1}. ${team.team}
- 
+${index + 1}. ${team.team}
 <br>
- 
 PF:
 ${team.pf.toFixed(2)}
- 
 </div>
 `).join("");
  
-// -----------------------
+// =====================================
 // OWNERS
-// -----------------------
+// =====================================
  
-document.getElementById("owners")
-.innerHTML =
-teams.map(team => `
+const ownersElement =
+document.getElementById(
+"owners"
+);
+ 
+if (ownersElement) {
+ 
+ownersElement.innerHTML =
+standings.map(team => `
 <div class="team">
- 
 ${team.owner}
- 
 <br>
- 
 <strong>
 ${team.team}
 </strong>
- 
 </div>
 `).join("");
  
-// -----------------------
+}
+ 
+// =====================================
 // WEEKLY MATCHUPS
-// -----------------------
+// WITH PROJECTIONS
+// =====================================
  
 const matchupGroups = {};
  
@@ -216,7 +229,7 @@ let matchupHTML = "";
 Object.values(matchupGroups)
 .forEach(group => {
  
-if(group.length === 2){
+if (group.length === 2) {
  
 const teamA =
 teams.find(
@@ -232,23 +245,95 @@ t.rosterId ===
 group[1].roster_id
 );
  
-matchupHTML +=
+if (!teamA || !teamB) return;
  
+const projA =
+(
+teamA.pf /
+Math.max(
+teamA.wins +
+teamA.losses,
+1
+)
+).toFixed(1);
+ 
+const projB =
+(
+teamB.pf /
+Math.max(
+teamB.wins +
+teamB.losses,
+1
+)
+).toFixed(1);
+ 
+const total =
+Number(projA) +
+Number(projB);
+ 
+const winA =
+(
+Number(projA) /
+total *
+100
+).toFixed(0);
+ 
+const winB =
+(
+Number(projB) /
+total *
+100
+).toFixed(0);
+ 
+const favorite =
+Number(projA) >
+Number(projB)
+? teamA.team
+: teamB.team;
+ 
+matchupHTML +=
 `
 <div class="matchup">
  
 <strong>
-${teamA?.team || "TBD"}
+${teamA.team}
 </strong>
  
 <br>
  
-vs
+Projection:
+${projA}
  
 <br>
  
+Win %:
+${winA}%
+ 
+<hr>
+ 
+VS
+ 
+<hr>
+ 
 <strong>
-${teamB?.team || "TBD"}
+${teamB.team}
+</strong>
+ 
+<br>
+ 
+Projection:
+${projB}
+ 
+<br>
+ 
+Win %:
+${winB}%
+ 
+<hr>
+ 
+Favorite:
+<strong>
+${favorite}
 </strong>
  
 </div>
@@ -258,14 +343,19 @@ ${teamB?.team || "TBD"}
  
 });
  
-document.getElementById(
-"matchups"
-).innerHTML =
+const matchupElement =
+document.getElementById("matchups");
+ 
+if (matchupElement) {
+ 
+matchupElement.innerHTML =
 matchupHTML;
  
-// -----------------------
-// NEWS
-// -----------------------
+}
+ 
+// =====================================
+// NEWS NETWORK
+// =====================================
  
 document.getElementById("news")
 .innerHTML =
@@ -286,21 +376,29 @@ ${sacko[0].team}
  
 <br><br>
  
-Weekly matchup center is now live.
+Weekly matchups and projections
+are now live.
+ 
+<br><br>
+ 
+Current #1 team:
+${standings[0].team}
+continued to set the pace for
+the league.
 `;
  
 }
-catch(error){
+catch (error) {
  
 console.error(error);
  
-document.getElementById("news")
-.innerHTML =
-"Error loading league data.";
+document.getElementById(
+"news"
+).innerHTML =
+"Error loading Sleeper data.";
  
 }
  
 }
  
-loadLeague();
 loadLeague();
