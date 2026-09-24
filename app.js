@@ -4,27 +4,31 @@ async function loadLeague() {
  
 try {
  
-// USERS
- 
-const usersResponse =
-await fetch(
+const usersResponse = await fetch(
 `https://api.sleeper.app/v1/league/${LEAGUE_ID}/users`
 );
  
-const users =
-await usersResponse.json();
- 
-// ROSTERS
- 
-const rostersResponse =
-await fetch(
+const rostersResponse = await fetch(
 `https://api.sleeper.app/v1/league/${LEAGUE_ID}/rosters`
 );
  
-const rosters =
-await rostersResponse.json();
+const leagueResponse = await fetch(
+`https://api.sleeper.app/v1/league/${LEAGUE_ID}`
+);
  
-// BUILD TEAMS
+const users = await usersResponse.json();
+const rosters = await rostersResponse.json();
+const league = await leagueResponse.json();
+ 
+const currentWeek =
+league.settings?.leg || 1;
+ 
+const matchupsResponse = await fetch(
+`https://api.sleeper.app/v1/league/${LEAGUE_ID}/matchups/${currentWeek}`
+);
+ 
+const matchupData =
+await matchupsResponse.json();
  
 const teams = rosters.map(roster => {
  
@@ -54,29 +58,26 @@ losses:
 roster.settings?.losses || 0,
  
 pf:
-Number(roster.settings?.fpts || 0) +
+(roster.settings?.fpts || 0) +
 (
-Number(
-roster.settings?.fpts_decimal || 0
-) / 100
+(roster.settings?.fpts_decimal || 0)
+/ 100
 )
  
 };
  
 });
  
-console.log("Teams", teams);
- 
+// -----------------------
 // STANDINGS
+// -----------------------
  
 const topFive =
 [...teams]
 .sort((a,b)=>{
  
-if (b.wins !== a.wins) {
- 
+if(b.wins !== a.wins){
 return b.wins - a.wins;
- 
 }
  
 return b.pf - a.pf;
@@ -86,15 +87,12 @@ return b.pf - a.pf;
  
 const bottomFive =
 [...teams]
-.filter(
-team =>
+.filter(team =>
 !topFive.some(
 t => t.team === team.team
 )
 )
-.sort(
-(a,b)=>b.pf-a.pf
-);
+.sort((a,b)=>b.pf-a.pf);
  
 const standings =
 [
@@ -102,12 +100,9 @@ const standings =
 ...bottomFive
 ];
  
-// STANDINGS CARD
- 
 document.getElementById("standings")
 .innerHTML =
-standings.map(
-(team,index)=>`
+standings.map((team,index)=>`
 <div class="team">
  
 #${index+1}
@@ -130,13 +125,14 @@ ${team.pf.toFixed(2)}
 </div>
 `).join("");
  
+// -----------------------
 // POWER RANKINGS
+// -----------------------
  
 document.getElementById(
 "powerRankings"
 ).innerHTML =
-standings.map(
-(team,index)=>`
+standings.map((team,index)=>`
 <div class="team">
  
 #${index+1}
@@ -144,10 +140,11 @@ standings.map(
 ${team.team}
  
 </div>
-`
-).join("");
+`).join("");
  
+// -----------------------
 // DRESS TRACKER
+// -----------------------
  
 const sacko =
 [...teams]
@@ -159,13 +156,10 @@ const sacko =
 document.getElementById(
 "dressTracker"
 ).innerHTML =
-sacko.map(
-(team,index)=>`
+sacko.map((team,index)=>`
 <div class="team">
  
-${index+1}.
- 
-${team.team}
+${index+1}. ${team.team}
  
 <br>
  
@@ -173,19 +167,15 @@ PF:
 ${team.pf.toFixed(2)}
  
 </div>
-`
-).join("");
+`).join("");
  
+// -----------------------
 // OWNERS
+// -----------------------
  
-const ownersElement =
-document.getElementById("owners");
- 
-if(ownersElement){
- 
-ownersElement.innerHTML =
-standings.map(
-team=>`
+document.getElementById("owners")
+.innerHTML =
+teams.map(team => `
 <div class="team">
  
 ${team.owner}
@@ -197,36 +187,91 @@ ${team.team}
 </strong>
  
 </div>
-`
-).join("");
+`).join("");
+ 
+// -----------------------
+// WEEKLY MATCHUPS
+// -----------------------
+ 
+const matchupGroups = {};
+ 
+matchupData.forEach(matchup => {
+ 
+if (!matchupGroups[matchup.matchup_id]) {
+ 
+matchupGroups[
+matchup.matchup_id
+] = [];
  
 }
  
-// MATCHUPS PLACEHOLDER
+matchupGroups[
+matchup.matchup_id
+].push(matchup);
  
-const matchupsElement =
-document.getElementById(
-"matchups"
+});
+ 
+let matchupHTML = "";
+ 
+Object.values(matchupGroups)
+.forEach(group => {
+ 
+if(group.length === 2){
+ 
+const teamA =
+teams.find(
+t =>
+t.rosterId ===
+group[0].roster_id
 );
  
-if(matchupsElement){
+const teamB =
+teams.find(
+t =>
+t.rosterId ===
+group[1].roster_id
+);
  
-matchupsElement.innerHTML =
+matchupHTML +=
+ 
 `
-<div class="team">
-Weekly Matchup Center
-Coming Next Phase
+<div class="matchup">
+ 
+<strong>
+${teamA?.team || "TBD"}
+</strong>
+ 
+<br>
+ 
+vs
+ 
+<br>
+ 
+<strong>
+${teamB?.team || "TBD"}
+</strong>
+ 
 </div>
 `;
+ 
 }
  
+});
+ 
+document.getElementById(
+"matchups"
+).innerHTML =
+matchupHTML;
+ 
+// -----------------------
 // NEWS
+// -----------------------
  
 document.getElementById("news")
 .innerHTML =
 `
 <strong>
-Current Leader:
+League Leader:
 </strong>
  
 ${standings[0].team}
@@ -241,7 +286,7 @@ ${sacko[0].team}
  
 <br><br>
  
-Live standings successfully loaded from Sleeper.
+Weekly matchup center is now live.
 `;
  
 }
@@ -251,10 +296,11 @@ console.error(error);
  
 document.getElementById("news")
 .innerHTML =
-"Error loading league.";
+"Error loading league data.";
  
 }
  
 }
  
+loadLeague();
 loadLeague();
