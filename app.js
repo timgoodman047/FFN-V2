@@ -1,34 +1,35 @@
 console.log("app.js loaded");
  
-document.getElementById("standings").innerHTML = `
-<div class="team">
-✅ Standings Working
-</div>
-`;
+async function testSleeper() {
  
-document.getElementById("powerRankings").innerHTML = `
-<div class="team">
-✅ Rankings Working
-</div>
-`;
+try {
  
-document.getElementById("dressTracker").innerHTML = `
-<div class="team">
-✅ Dress Tracker Working
-</div>
-`;
+const response = await fetch(
+"https://api.sleeper.app/v1/league/1352723400459563008/users"
+);
  
-document.getElementById("matchups").innerHTML = `
-<div class="team">
-✅ Matchups Working
-</div>
-`;
+const users = await response.json();
  
-document.getElementById("owners").innerHTML = `
-<div class="team">
-✅ Owners Working
-</div>
-`;
+console.log(users);
  
-document.getElementById("news").innerHTML =
-"✅ News Feed Working";
+document.getElementById("standings").innerHTML =
+`<div class="team">
+✅ Sleeper API Connected
+<br>
+Users Found: ${users.length}
+</div>`;
+ 
+} catch (error) {
+ 
+console.error(error);
+ 
+document.getElementById("standings").innerHTML =
+`<div class="team">
+❌ API Error
+</div>`;
+ 
+}
+ 
+}
+ 
+testSleeper();
